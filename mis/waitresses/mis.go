@@ -3,7 +3,10 @@ package waitresses
 import (
 	"fmt"
 	// "github.com/gorilla/mux"
+	"../beers"
+	"../buckets"
 	"net/http"
+	"time"
 )
 
 /*
@@ -20,16 +23,34 @@ func init() {
 	// 使用路由设置对应的方法
 	router.HandleFunc(fmt.Sprint(misResourceUrl, "/{id}"), GetMis).
 		Methods("GET")
-	/*
-		router.HandleFunc(misResourceUrl, PostMis).
-			Methods("POST")
-		router.HandleFunc(fmt.Sprint(misResourceUrl, "/{id}"), DeleteMis).
-			Methods("DELETE")
-	*/
+	router.HandleFunc(misResourceUrl, PostMis).
+		Methods("POST")
+	router.HandleFunc(fmt.Sprint(misResourceUrl, "/{id}"), DeleteMis).
+		Methods("DELETE")
 }
 
 func GetMis(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Get a mis.")
+	/*
+		err := beers.AddMis()
+		if err != nil {
+			fmt.Fprintln(w, err.Error())
+			return
+		}
+	*/
+
+	mis := &beers.Mis{
+		"The first Mis.",
+		"It's just a test.",
+		time.Now(),
+	}
+
+	err := buckets.SharedMisBucket.Add(mis)
+	if err != nil {
+		fmt.Fprintln(w, err.Error())
+		return
+	}
+
+	fmt.Fprintln(w, "Success!")
 	/*
 		err := r.ParseForm()
 
@@ -44,4 +65,12 @@ func GetMis(w http.ResponseWriter, r *http.Request) {
 
 		id := mux.Vars(r)["id"]
 	*/
+}
+
+func PostMis(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Post a mis!")
+}
+
+func DeleteMis(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Delete a mis!")
 }

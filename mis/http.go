@@ -23,6 +23,7 @@ func init() {
 	*/
 
 	// http.Handle("/", router)
+
 	http.Handle("/", waitresses.GetRouter())
 }
 
